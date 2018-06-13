@@ -69,9 +69,27 @@ class DataFrame(object):
     def filter(self, params):
         return self.__frame.where(params)
 
+    def repartitition(self, n):
+        return self.__frame.repartitition(n)
+
     def describe(self):
         """
-        This is super sluggish right now, need to figure out performance
-        enhancement
+        Better method, but needs to run each col sequentially
         """
-        return self.__frame.describe()
+        dtypes = self.dtypes
+        vals = []
+        for c in dtypes[dtypes.isin(['bigint','double'])].index:
+            vals.append(self.__describe_col(c))
+        vals = pd.DataFrame(vals)
+        return vals.set_index('column').T
+
+    def __describe_col(self, c):
+        vals = self.__frame.where(self.__frame[c].isNotNull()).agg(
+            count(c).alias('count'),
+            mean(c).alias('mean'),
+            stddev(c).alias('std'),
+            max(c).alias('max'),
+            min(c).alias('min')
+            ).collect()[0].asDict()
+        vals['column'] = c
+        return vals
