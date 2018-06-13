@@ -17,6 +17,14 @@ class DataFrame(object):
     def __init__(self, data=None, columns=None, query=None, file=None):
         """
         Ok so bad way of doing this right now, but it works, so stop complaining
+
+        Parameters
+        ----------
+        data : list of tuples, lists, or dicts
+        columns : list of str
+        query : str
+        file : str
+            Path on DBFS or cluster for a parquet file
         """
         if data:
             self.__frame = spark.createDataFrame(data, columns)
@@ -29,6 +37,10 @@ class DataFrame(object):
     def read_sql_query(cls, query=None):
         """
         Read a sql query into a dataframe
+
+        Parameters
+        ----------
+        query : str
         """
         return cls(query=query)
 
@@ -57,4 +69,8 @@ class DataFrame(object):
         return self.__frame.where(params)
 
     def describe(self):
+        """
+        This is super sluggish right now, need to figure out performance
+        enhancement
+        """
         return self.__frame.describe()
