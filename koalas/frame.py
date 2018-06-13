@@ -1,3 +1,4 @@
+from koalas.config import SPARK as spark
 import pandas as pd
 
 class DataFrame(object):
