@@ -6,6 +6,15 @@ pandas doesn't necessarily exist, so koalas looks to tackle that problem.
 NOTE: This assumes you are using Databricks as they give you by default the
 SparkSession. Will endeavor to add the functionality later.
 
+Setup:
+```
+git clone http://prdbitbucket.saccap.int/scm/gdwn/koalas.git
+cd koalas
+python setup.py bdist_egg
+```
+
+Copy the `.egg` file from dist to Databricks.
+
 To do:
 - Deal with caching results as execute rather than chaining (this is going to be
   tricky).
