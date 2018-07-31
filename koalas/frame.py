@@ -108,6 +108,8 @@ class DataFrame(object):
         """
         Create a pandas DataFrame
 
+        Use PyArrow to make the serialization much faster.
+
         Returns
         -------
         pd.DataFrame
