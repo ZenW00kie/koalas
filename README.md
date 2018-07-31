@@ -20,3 +20,4 @@ To do:
   tricky).
 - Have upon return execute show()
 - deal with conversion of types
+- Add column methods

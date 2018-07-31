@@ -26,6 +26,12 @@ class DataFrame(object):
         query : str
         file : str
             Path on DBFS or cluster for a parquet file
+
+        Attributes
+        ----------
+        __frame : spark.DataFrame
+            Underlying DataFrame is still Spark, but private so only Koalas
+            methods can be called.
         """
         if data:
             self.__frame = spark.createDataFrame(data, columns)
@@ -42,20 +48,32 @@ class DataFrame(object):
         Parameters
         ----------
         query : str
+
+        Returns
+        -------
+        koalas.DataFrame
         """
         return cls(query=query)
 
     @classmethod
     def read_parquet(cls, file):
         """
-        read parquet file
+        Read parquet file
+
+        Returns
+        -------
+        koalas.DataFrame
         """
         return cls(file=file)
 
     @property
     def dtypes(self):
         """
-        return datatypes as it's own pd.Series, similar to pandas
+        Return datatypes as it's own pd.Series, similar to pandas
+
+        Returns
+        -------
+        pd.Series
         """
         data = self.__frame.dtypes
         data = list(zip(*data))
@@ -63,27 +81,61 @@ class DataFrame(object):
 
     @property
     def columns(self):
+        """
+        Return a list of the columns for the DataFrame
+
+        Returns
+        -------
+        list
+        """
         return self.__frame.columns
 
     @property
     def filter(self, params):
+        """
+        Filter the DataFrame
+
+        Returns
+        -------
+        koalas.DataFrame
+        """
         return self.__frame.where(params)
 
     def repartition(self, n):
         return self.__frame.repartition(n)
 
     def to_pandas(self):
+        """
+        Create a pandas DataFrame
+
+        Returns
+        -------
+        pd.DataFrame
+        """
         spark.conf.set('spark.sql.execution.arrow.enable', 'true')
         data = self.__frame.toPandas()
         spark.conf.set('spark.sql.execution.arrow.enable', 'false')
         return data
 
     def to_csv(self, fn, **kwargs):
-        return self.__frame.to_pandas().to_csv(fn, kwargs)
+        """
+        Export to a CSV
+
+        Currently uses Pandas method, but should change to allow for larger
+        datasets to be exported (potentially specify the number of partitions).
+        All the pandas to_csv kwargs are available.
+        """
+        self.__frame.to_pandas().to_csv(fn, kwargs)
 
     def describe(self):
         """
         Better method, but needs to run each col sequentially
+
+        Potentially could multithread, not sure how people would feel about that
+
+        Returns
+        -------
+        pd.DataFrame
         """
         dtypes = self.dtypes
         vals = []
