@@ -69,8 +69,17 @@ class DataFrame(object):
     def filter(self, params):
         return self.__frame.where(params)
 
-    def repartitition(self, n):
-        return self.__frame.repartitition(n)
+    def repartition(self, n):
+        return self.__frame.repartition(n)
+
+    def to_pandas(self):
+        spark.conf.set('spark.sql.execution.arrow.enable', 'true')
+        data = self.__frame.toPandas()
+        spark.conf.set('spark.sql.execution.arrow.enable', 'false')
+        return data
+
+    def to_csv(self, fn, **kwargs):
+        return self.__frame.to_pandas().to_csv(fn, kwargs)
 
     def describe(self):
         """
@@ -84,6 +93,7 @@ class DataFrame(object):
         return vals.set_index('column').T
 
     def __describe_col(self, c):
+        from pyspark.sql.functions import count, mean, stddev, max, min
         vals = self.__frame.where(self.__frame[c].isNotNull()).agg(
             count(c).alias('count'),
             mean(c).alias('mean'),
