@@ -157,3 +157,18 @@ class DataFrame(object):
             ).collect()[0].asDict()
         vals['column'] = c
         return vals
+
+    def melt(self,
+             id_vars=None,
+             value_vars=None,
+             var_name='variable',
+             value_name='value'):
+        """Convert :class:`DataFrame` from wide to long format."""
+        _vars_and_vals = array(*(
+            struct(lit(c).alias(var_name), col(c).alias(value_name))
+            for c in value_vars))
+        _tmp = self.__frame.withColumn("_vars_and_vals",
+                                       explode(_vars_and_vals))
+        cols = id_vars + [col("_vars_and_vals")[x].alias(x)
+                          for x in [var_name, value_name]]
+        return _tmp.select(*cols)
