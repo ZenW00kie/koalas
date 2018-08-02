@@ -1,3 +1,11 @@
+"Let's make PySpark Great Again" (Not that it ever wasn't, but you know...)
+
+# koalas
+
+Making PySpark more pandas-like
+
+---
+
 Welcome to koalas, the wrapper on the wrapper for Spark. The real iteration of
 this should circumvent using PySpark, but for now we're going to use that as our
 base. We've found the learning the syntax and some of the functionality from
